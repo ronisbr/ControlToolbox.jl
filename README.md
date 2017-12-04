@@ -59,7 +59,7 @@ that I can update this table!
 
 To install the package, execute the following command:
 
-    Pkg.add("https://github.com/ronisbr/ControlToobox.jl")
+    Pkg.clone("https://github.com/ronisbr/ControlToolbox.jl")
 
 To use the package, execute the following command:
 
@@ -153,7 +153,7 @@ G = tf([1;2;2],[1;9;33;51;26])
 
 rlocus(G)
 ```
-![Root Locus](https://github.com/ronisbr/raw/master/figs/rlocus.gif "Root Locus")
+![Root Locus](https://github.com/ronisbr/ControlToolbox.jl/raw/master/figs/rlocus.gif "Root Locus")
 
 ```julia
 # Bode diagram
