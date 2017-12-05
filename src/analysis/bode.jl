@@ -55,16 +55,25 @@ function bode(sys::StateSpace, w::Array=[]; plot=true)
     end
 
     # Frequency response for each pair input/output.
-    gain  = Vector{Matrix{Float64}}(length(w))
-    phase = Vector{Matrix{Float64}}(length(w))
+    gain  = Vector{Vector{Float64}}(length(w))
+    phase = Vector{Vector{Float64}}(length(w))
 
     for i = 1:length(w)
         s = Complex(0,w[i])
 
-        fr = C*inv(s*eye_s-A)*B+D
+        # `fr` is always a vector. Hence, we can squeeze one dimension here.
+        fr = squeeze(C*inv(s*eye_s-A)*B+D,1)
 
-        gain[i]  = 20*log10.(Float64[ norm(f) for f in fr ])
-        phase[i] = Float64[ atan2(imag(f), real(f))*180.0/pi for f in fr ]
+        gain[i]  = 20*log10.([ norm(f) for f in fr ])
+        phase[i] = [ angle(f)*180.0/pi for f in fr ]
+
+        if i > 1
+            # Make sure that the phase plot is continuous. This can be done by
+            # analysing the difference between the current phase and the latest
+            # one and checking if it is higher than +180.0 or lower than -180.0.
+            Δ = phase[i] - phase[i-1]
+            phase[i] += (Δ .> 180.0) * (-360.0) + (Δ .< -180.0) * (+360.0)
+        end
     end
 
     ( plot ) && plot_bode(gain, phase, w, num_u, num_y)
