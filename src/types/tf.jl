@@ -368,7 +368,13 @@ function tf2ss(G::TransferFunction, form=:controllable)
         a, b = divrem(G.den, G.num)
 
         # In this case, there is a direct path input-output.
-        D = a.a''
+        #
+        # Notice that `D` must be a Matrix instead of the Vector. Hence, we use
+        # the operator [:,:] here as described in:
+        #
+        #     https://stackoverflow.com/questions/34595122/the-best-way-to-convert-vector-into-matrix-in-julia
+
+        D = a.a[:,:]
 
         num = -b.a
         num_dim -= 1
