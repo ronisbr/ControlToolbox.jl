@@ -139,6 +139,7 @@ include("aux.jl")
 
 include("analysis/bode.jl")
 include("analysis/gain_poles_zeros.jl")
+include("analysis/margin.jl")
 include("analysis/minreal.jl")
 include("analysis/nyquist.jl")
 include("analysis/pole_info.jl")

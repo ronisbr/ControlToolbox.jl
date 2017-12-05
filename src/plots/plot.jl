@@ -66,5 +66,6 @@ const alw   = 1.5   # Axes line width.
 
 include("plot_bode.jl")
 include("plot_lsim.jl")
+include("plot_margin.jl")
 include("plot_nyquist.jl")
 include("plot_rlocus.jl")
