@@ -96,6 +96,14 @@ function nyquist(sys::StateSpace, w::Array=[]; plot=true)
         real_fr_i  = Float64[real(f) for f in fr]
         imag_fr_i  = Float64[imag(f) for f in fr]
 
+        # If w == 0 and A is singular, then we have a pole at the origin. In
+        # this case, we must not consider the frequencies computed to plot the
+        # graph.
+        if (wi == 0.0) && (det(A) == 0.0)
+            real_fr_i = ones(real_fr_i)*Inf
+            imag_fr_i = ones(imag_fr_i)*Inf
+        end
+
         if w_user || (i == 1)
             i += 1
             push!(real_fr,     +real_fr_i)
@@ -115,7 +123,7 @@ function nyquist(sys::StateSpace, w::Array=[]; plot=true)
                 elseif i == length(w)
                     w = [w[1:i-2]; collect(linspace(w[i-1],w[i],10))]
                 else
-                    w = [w[1:i-2]; collect(linspace(w[i-1],w[i],10)); w[i:end]]
+                    w = [w[1:i-2]; collect(linspace(w[i-1],w[i],10)); w[i+1:end]]
                 end
             else
                 i += 1
@@ -124,11 +132,6 @@ function nyquist(sys::StateSpace, w::Array=[]; plot=true)
                 push!(mir_imag_fr, -imag_fr_i)
             end
         end
-    end
-
-    if !w_user
-        real_fr = [reverse(real_fr);     real_fr]
-        imag_fr = [reverse(mir_imag_fr); imag_fr]
     end
 
     ( plot ) && plot_nyquist(real_fr, imag_fr, num_u, num_y)

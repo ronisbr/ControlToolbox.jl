@@ -26,6 +26,8 @@ function plot_nyquist(real_fr, imag_fr, num_u, num_y)
             imag_fr_i = map(x->x[i], imag_fr)
 
             ax[i][:plot](real_fr_i, imag_fr_i, linewidth=plw)
+            ax[i][:plot](real_fr_i, -imag_fr_i, linewidth=plw)
+
             ax[i][:grid]("on", which="major",
                          color="#AAAAAA", linewidth=glw, zorder=1)
 
@@ -39,24 +41,35 @@ function plot_nyquist(real_fr, imag_fr, num_u, num_y)
             #     1) 1/4 of the range of the real part;
             #     2) 1/2 of the range of the real part;
             #     3) 3/4 of the range of the real part.
-            fq_x  = 1(minimum(real_fr_i)+maximum(real_fr_i))/4
-            mid_x = 2(minimum(real_fr_i)+maximum(real_fr_i))/4
-            tq_x  = 3(minimum(real_fr_i)+maximum(real_fr_i))/4
+            min_real_fr = minimum(real_fr_i)
+            max_real_fr = maximum(real_fr_i)
+            Δp_real     = max_real_fr - min_real_fr
+
+            fq_x  = min_real_fr + 1*Δp_real/4
+            mid_x = min_real_fr + 2*Δp_real/4
+            tq_x  = min_real_fr + 3*Δp_real/4
 
             for p in [fq_x, mid_x, tq_x]
                 # Search for the freq. that provides the closest real part to p.
-                ind_n = indmin(abs.(real_fr_i-p))
-                ind_p = length(real_fr_i)-ind_n
+                ind = indmin(abs.(real_fr_i-p))
+
+                # Compute the tangent.
+                Δ = [real_fr_i[ind+1] - real_fr_i[ind];
+                     imag_fr_i[ind+1] - imag_fr_i[ind];]
 
                 ax[i][:annotate]("",
-                                 xytext = [real_fr_i[ind_n];   imag_fr_i[ind_n]],
-                                 xy     = [real_fr_i[ind_n+1]; imag_fr_i[ind_n+1]],
+                                 xytext = [real_fr_i[ind];
+                                           imag_fr_i[ind]],
+                                 xy     = [real_fr_i[ind]+Δ[1]*0.01;
+                                           imag_fr_i[ind]+Δ[2]*0.01],
                                  arrowprops = Dict("arrowstyle"=>"simple"),
                                  size       = arrsz)
 
                 ax[i][:annotate]("",
-                                 xytext = [real_fr_i[ind_p];   imag_fr_i[ind_p]],
-                                 xy     = [real_fr_i[ind_p+1]; imag_fr_i[ind_p+1]],
+                                 xytext = [ real_fr_i[ind+1];
+                                           -imag_fr_i[ind+1]],
+                                 xy     = [ real_fr_i[ind+1]-Δ[1]*0.01;
+                                           -imag_fr_i[ind+1]+Δ[2]*0.01],
                                  arrowprops = Dict("arrowstyle"=>"simple"),
                                  size       = arrsz)
             end
