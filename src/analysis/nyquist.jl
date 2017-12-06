@@ -46,7 +46,15 @@ function nyquist(sys::StateSpace, w::Array=[]; plot=true)
     eye_s = eye(num_states)
 
     # Check if the vector of frequencies was provided.
-    if (isempty(w))
+    w_user = !isempty(w)
+
+    w_final = 0.0
+
+    tol = 0.0
+
+    # If the user did not provide a vector with frequencies, then they will be
+    # computed automatically.
+    if (!w_user)
         # If not, compute the bode diagram from a frequency two decades lower
         # than the minimum frequency and two decades higher than the maximum
         # frequency.
@@ -57,20 +65,70 @@ function nyquist(sys::StateSpace, w::Array=[]; plot=true)
 
         w_final   = (highest_freq != 0)  ?  highest_freq*100.0 : 1e+2
 
-        w = collect(-w_final:0.01:w_final)
+        # Compute the tolerance using the DC gain.
+        dc_gain = maximum(D + C*pinv(eye(A)-A)*B)
+        tol     = dc_gain/50.0
+
+        # Don't let tolerance to be 0.
+        (tol == 0) && (tol = 1e-2)
+
+        # Initialize the vector `w` with 100 points between the minimum and
+        # maximum frequencies.
+        w = collect(linspace(0,w_final,100))
     end
 
     # Frequency response for each pair input/output.
-    real_fr = Vector{Matrix{Float64}}(length(w))
-    imag_fr = Vector{Matrix{Float64}}(length(w))
+    real_fr     = Vector{Matrix{Float64}}(0)
+    imag_fr     = Vector{Matrix{Float64}}(0)
+    mir_imag_fr = Vector{Matrix{Float64}}(0)
 
-    for i = 1:length(w)
-        s = Complex(0,w[i])
+    # Compute the Nyquist plot.
+    i  = 1
+    wi = w[1]
 
-        fr = C*inv(s*eye_s-A)*B+D
+    while i <= length(w)
+        wi = w[i]
 
-        real_fr[i]  = Float64[real(f) for f in fr]
-        imag_fr[i]  = Float64[imag(f) for f in fr]
+        s = Complex(0,wi)
+
+        fr = C*pinv(s*eye_s-A)*B+D
+
+        real_fr_i  = Float64[real(f) for f in fr]
+        imag_fr_i  = Float64[imag(f) for f in fr]
+
+        if w_user || (i == 1)
+            i += 1
+            push!(real_fr,     +real_fr_i)
+            push!(imag_fr,     +imag_fr_i)
+
+            (!w_user) && push!(mir_imag_fr, -imag_fr_i)
+        else
+            # Verify the maximum distance between the current point and the last
+            # one.
+            Δx = maximum(abs.(real_fr_i - real_fr[i-1]))
+            Δy = maximum(abs.(imag_fr_i - imag_fr[i-1]))
+
+            # Accept the point if the tolerance is higher than the distances.
+            if (maximum([Δx;Δy]) > tol) && ( (w[i]-w[i-1]) > 1e-2 )
+                if i == 2
+                    w = [collect(linspace(w[1],w[2],10)); w[3:end]]
+                elseif i == length(w)
+                    w = [w[1:i-2]; collect(linspace(w[i-1],w[i],10))]
+                else
+                    w = [w[1:i-2]; collect(linspace(w[i-1],w[i],10)); w[i:end]]
+                end
+            else
+                i += 1
+                push!(real_fr,     +real_fr_i)
+                push!(imag_fr,     +imag_fr_i)
+                push!(mir_imag_fr, -imag_fr_i)
+            end
+        end
+    end
+
+    if !w_user
+        real_fr = [reverse(real_fr);     real_fr]
+        imag_fr = [reverse(mir_imag_fr); imag_fr]
     end
 
     ( plot ) && plot_nyquist(real_fr, imag_fr, num_u, num_y)
