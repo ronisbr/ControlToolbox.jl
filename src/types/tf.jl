@@ -29,10 +29,10 @@ function zpk(z::Array, p::Array, K::Number; real_coefs = true)
     num_p = length(p)
 
     # Numerator.
-    num = K*poly(z)
+    num = (isempty(z)) ? Poly(K) : poly(z)
 
     # Denominator.
-    den = poly(p)
+    den = (isempty(p)) ? Poly(1) : poly(p)
 
     # Check if the transfer function must only have real coefficients.
     if real_coefs
