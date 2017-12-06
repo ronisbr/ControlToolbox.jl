@@ -51,7 +51,8 @@ function bode(sys::StateSpace, w::Array=[]; plot=true)
         w_initial = (smallest_freq != 0) ? smallest_freq/100.0 : 1e-2
         w_final   = (highest_freq != 0)  ?  highest_freq*100.0 : 1e+2
 
-        w = collect(w_initial:0.01:w_final)
+        # Compute 500 logarithmically spaced points.
+        w = logspace(log10(w_initial), log10(w_final), 500)
     end
 
     # Frequency response for each pair input/output.
