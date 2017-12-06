@@ -27,16 +27,13 @@ function plot_nyquist(real_fr, imag_fr, num_u, num_y)
 
             ax[i][:plot](real_fr_i, imag_fr_i, linewidth=plw)
             ax[i][:grid]("on", which="major",
-                         color="#AAAAAA", linewidth=glw)
+                         color="#AAAAAA", linewidth=glw, zorder=1)
 
-            # Ensure the X axis includes the point x = -1.
-            xlims = ax[i][:get_xlim]()
-            ax[i][:set_xlim]([min(-1.05, xlims[1]), xlims[2]])
-
-            # Mark the -1 point.
+            # Mark the -1 point but do not resize the plot.
+            ax[i][:autoscale](false)
             ax[i][:scatter]([-1.0],[0.0],
                             s=mksz, marker="+", linewidths=plw,
-                            edgecolor="red", color="red")
+                            edgecolor="red", color="red", zorder=3)
 
             # Create arrows at:
             #     1) 1/4 of the range of the real part;
