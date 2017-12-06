@@ -75,7 +75,7 @@ function plot_margin(gain, phase, w, Gm, Pm, wcg, wcp; tol = sqrt(eps()))
 
         # Plot a line indicating the margins if applicable.
         if (!isinf(Gm)) && (wcg > tol)
-            ax[1][:arrow](wcg, 0, 0, Gm_dB,
+            ax[1][:arrow](wcg, 0, 0, -Gm_dB,
                           linewidth=3.0, length_includes_head=true,
                           head_width=0, head_length=0,
                           facecolor="#F0B300", edgecolor="#F0B300", zorder=4)
