@@ -58,12 +58,12 @@ function nyquist(sys::StateSpace, w::Array=[]; plot=true)
         # If not, compute the bode diagram from a frequency two decades lower
         # than the minimum frequency and two decades higher than the maximum
         # frequency.
-        poles = pole(sys)
+        poles      = pole(sys)
+        real_poles = abs.(real(poles[poles .!= 0]))
 
         # Get maximum frequency of the system.
-        highest_freq  = maximum(abs.(real(poles[poles .!= 0])))
-
-        w_final   = (highest_freq != 0)  ?  highest_freq*100.0 : 1e+2
+        highest_freq = (isempty(real_poles)) ? 0.0 : maximum(real_poles)
+        w_final = (highest_freq != 0) ? highest_freq*100.0 : 1e+2
 
         # Compute the tolerance using the DC gain.
         dc_gain = maximum(D + C*pinv(eye(A)-A)*B)
