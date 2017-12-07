@@ -44,8 +44,8 @@ function plot_nyquist(real_fr, imag_fr, num_u, num_y)
             #     1) 1/4 of the range of the real part;
             #     2) 1/2 of the range of the real part;
             #     3) 3/4 of the range of the real part.
-            min_real_fr = minimum(real_fr_i)
-            max_real_fr = maximum(real_fr_i)
+            min_real_fr = minimum(real_fr_i[isfinite.(real_fr_i)])
+            max_real_fr = maximum(real_fr_i[isfinite.(real_fr_i)])
             Δp_real     = max_real_fr - min_real_fr
 
             fq_x  = min_real_fr + 1*Δp_real/4
