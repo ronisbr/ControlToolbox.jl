@@ -25,8 +25,11 @@ function plot_nyquist(real_fr, imag_fr, num_u, num_y)
             real_fr_i = map(x->x[i], real_fr)
             imag_fr_i = map(x->x[i], imag_fr)
 
-            ax[i][:plot](real_fr_i, imag_fr_i, linewidth=plw)
-            ax[i][:plot](real_fr_i, -imag_fr_i, linewidth=plw)
+            # Get the default color for the plots.
+            color = pybuiltin("next")(ax[i][:_get_lines][:prop_cycler])["color"]
+
+            ax[i][:plot](real_fr_i, +imag_fr_i, color=color, linewidth=plw)
+            ax[i][:plot](real_fr_i, -imag_fr_i, color=color, linewidth=plw)
 
             ax[i][:grid]("on", which="major",
                          color="#AAAAAA", linewidth=glw, zorder=1)
