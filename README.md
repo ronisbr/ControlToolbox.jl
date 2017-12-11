@@ -1,5 +1,7 @@
 # ControlToolbox.jl
 
+[![Build Status](https://travis-ci.org/ronisbr/ControlToolbox.jl.svg?branch=master)](https://travis-ci.org/ronisbr/ControlToolbox.jl)
+
 This is a Control Toolbox for design and test control systems using Julia
 language. The package development started in 2014 and was created to solve two
 problems that the other packages I found on Internet could not solve:
