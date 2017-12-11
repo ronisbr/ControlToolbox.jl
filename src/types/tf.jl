@@ -29,7 +29,7 @@ function zpk(z::Array, p::Array, K::Number; real_coefs = true)
     num_p = length(p)
 
     # Numerator.
-    num = (isempty(z)) ? Poly(K) : poly(z)
+    num = (isempty(z)) ? Poly(K) : K*poly(z)
 
     # Denominator.
     den = (isempty(p)) ? Poly(1) : poly(p)
