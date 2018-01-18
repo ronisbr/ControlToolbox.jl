@@ -365,7 +365,7 @@ function tf2ss(G::TransferFunction, form=:controllable)
         # in which K is scalar and G1 is strictly proper.
         #
 
-        a, b = divrem(G.den, G.num)
+        a, b = divrem(G.num,G.den)
 
         # In this case, there is a direct path input-output.
         #
@@ -376,7 +376,7 @@ function tf2ss(G::TransferFunction, form=:controllable)
 
         D = a.a[:,:]
 
-        num = -b.a
+        num = +b.a
         num_dim -= 1
     else
         # In this case, there is not a direct path input-output.
